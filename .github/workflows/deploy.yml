@@ -1,8 +1,8 @@
-name: Deploy site to S3
+name: Deploy site to S3 and invalidate CloudFront
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "main" ]
 
 jobs:
   deploy:
@@ -27,3 +27,8 @@ jobs:
             --exclude ".github/*" \
             --exclude "README.md"
 
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.CLOUDFRONT_DIST_ID }} \
+            --paths "/*"
