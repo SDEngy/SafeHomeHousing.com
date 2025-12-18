@@ -5,25 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome to Safe Home Housing</title>
     <link rel="stylesheet" href="styles.css">
-    <script>
-        async function invalidateCache() {
-            try {
-                const response = await fetch('/invalidate-cache', {
-                    method: 'POST',
-                });
-                if (response.ok) {
-                    console.log('Cache invalidated successfully');
-                } else {
-                    console.error('Failed to invalidate cache');
-                }
-            } catch (error) {
-                console.error('Error invalidating cache:', error);
-            }
-        }
-
-        // Call the function on page load or based on specific events
-        window.onload = invalidateCache;
-    </script>
 </head>
 <body>
     <header>
