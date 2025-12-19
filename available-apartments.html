@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Currently Available Apartments</title>
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        async function fetchApartments() {
+            const sheetUrl = 'https://docs.google.com/spreadsheets/d/1crfLzsjJHH66EBpWjQh6zMvc25mq-09i6q1Idr9UnzU/gviz/tq?tqx=out:json';
+            try {
+                const response = await fetch(sheetUrl);
+                const text = await response.text();
+                const json = JSON.parse(text.substr(47).slice(0, -2));
+                const rows = json.table.rows;
+
+                const container = document.getElementById('apartments');
+                rows.forEach(row => {
+                    const apartment = document.createElement('div');
+                    apartment.className = 'apartment';
+                    apartment.innerHTML = row.c.map(cell => cell ? cell.v : '').join(' | ');
+                    container.appendChild(apartment);
+                });
+            } catch (error) {
+                console.error('Error fetching apartments:', error);
+            }
+        }
+
+        window.onload = fetchApartments;
+    </script>
+</head>
+<body>
+    <header>
+        <img src="SafeHomeHousingLogo.png" alt="Company Logo" style="width:200px;height:auto;">
+        <h1>Currently Available Apartments</h1>
+    </header>
+    <main>
+        <div id="apartments">
+            <p>Loading available apartments...</p>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2025 Safe Home Housing. All rights reserved.</p>
+    </footer>
+</body>
+</html>
