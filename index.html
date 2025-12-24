@@ -50,7 +50,7 @@
                 <img src="images/service_providers.png" alt="For Service Providers">
                 For Service Providers
             </button>
-            <button onclick="loadContent('available-apartments.html')">
+            <button onclick="showTable()">
                 <img src="images/apartments.png" alt="View Available Apartments">
                 View Available Apartments
             </button>
@@ -63,5 +63,88 @@
         <p>&copy; 2025 Safe Home Housing. All rights reserved.</p>
     </footer>
     <script src="script.js"></script>
+    <script>
+  const PROXY_URL = "https://script.google.com/macros/s/AKfycbz1QKg50ahv7tzHgGTp4SEorFto0Aq3zgBvT9AuHckhG5DuH4NIl6asaqsqfJYpyvWA/exec";
+
+  async function loadCsv() {
+    // cache-buster so CloudFront/browser won’t reuse a cached response
+    const url = `${PROXY_URL}?cb=${Date.now()}`;
+
+    const res = await fetch(url);
+    if (!res.ok) throw new Error("Proxy fetch failed: " + res.status);
+
+    const csvJson = await res.json();
+    console.log("CSV JSON:", csvJson); // Output CSV JSON to console for testing
+
+    // Filter rows where Website Available? is YES
+    const filteredRows = csvJson.rows.filter(row => row["Website Available?"] === "YES");
+
+    // Remove Address, Section 8 valid, and Website Available? columns
+    const filteredHeaders = csvJson.headers.filter(header => header !== "Address" && header !== "Section 8 valid" && header !== "Website Available?");
+
+    // Create table
+    const table = document.createElement("table");
+    table.style.tableLayout = "auto"; // Auto-width columns
+
+    // Add headers
+    const headerRow = document.createElement("tr");
+    filteredHeaders.forEach(header => {
+      const th = document.createElement("th");
+      th.textContent = header;
+      th.style.whiteSpace = "nowrap"; // Prevent text wrapping in headers
+      th.style.textAlign = "center"; // Center align text horizontally
+      headerRow.appendChild(th);
+    });
+    table.appendChild(headerRow);
+
+    // Add rows
+    filteredRows.forEach(row => {
+      const tr = document.createElement("tr");
+      filteredHeaders.forEach(header => {
+        const td = document.createElement("td");
+        td.style.whiteSpace = "nowrap"; // Prevent text wrapping in data rows
+        td.style.textAlign = "center"; // Center align text horizontally
+        td.style.verticalAlign = "middle"; // Center align text vertically
+        if (header === "AirBNB Link" && row[header]) {
+          const a = document.createElement("a");
+          a.href = row[header];
+          a.textContent = "View";
+          a.target = "_blank";
+          td.appendChild(a);
+        } else {
+          td.textContent = row[header] || ""; // Use empty string if value is undefined
+        }
+        tr.appendChild(td);
+      });
+      table.appendChild(tr);
+    });
+
+    const contentContainer = document.getElementById("content");
+    contentContainer.innerHTML = ""; // Clear existing content
+    contentContainer.appendChild(table);
+    contentContainer.style.display = "block"; // Show table
+  }
+
+  function showTable() {
+    const contentContainer = document.getElementById("content");
+    if (contentContainer.dataset.active !== "table") {
+      contentContainer.dataset.active = "table"; // Mark table as active
+      loadCsv().catch(console.error);
+    }
+  }
+
+  function loadContent(page) {
+    const contentContainer = document.getElementById("content");
+    contentContainer.style.display = "block"; // Ensure content is visible
+    contentContainer.dataset.active = "pdf"; // Mark PDF as active
+    contentContainer.innerHTML = `<embed src="${page}" width="100%" height="600px" type="application/pdf">`;
+  }
+</script>
+
+<style>
+  #content {
+    display: none; /* Hide content initially */
+  }
+</style>
 </body>
 </html>
