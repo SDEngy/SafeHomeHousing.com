@@ -3,8 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Safe Home Housing</title>
+    <title>SafeHomeHousing</title>
     <link rel="stylesheet" href="styles.css">
+    <script>
+        async function loadContent(page) {
+            const contentContainer = document.getElementById('content');
+            contentContainer.innerHTML = '<p>Loading...</p>';
+            try {
+                if (page === 'available-apartments.html') {
+                    const response = await fetch(page);
+                    const html = await response.text();
+                    contentContainer.innerHTML = html;
+
+                    // Dynamically execute scripts in the loaded content
+                    const scripts = contentContainer.querySelectorAll('script');
+                    scripts.forEach(script => {
+                        const newScript = document.createElement('script');
+                        newScript.textContent = script.textContent;
+                        document.body.appendChild(newScript);
+                    });
+                } else {
+                    contentContainer.innerHTML = `<embed src="${page}" width="100%" height="600px" type="application/pdf">`;
+                }
+            } catch (error) {
+                contentContainer.innerHTML = '<p>Error loading content.</p>';
+                console.error('Error loading content:', error);
+            }
+        }
+    </script>
 </head>
 <body>
     <header>
@@ -14,21 +40,25 @@
         <h1>Safe, Fully Furnished Housing for Adults with Developmental Disabilities</h1>
         <h2>Professionally managed apartments designed to work with SDRC services</h2>
     </header>
-    <main>
-        <p>Safe Home Housing is operated by experienced short-term rental professionals transitioning properties into stable, long-term housing.</p>
-        <button>
-            <img src="images/parents.png" alt="For Parents">
-            For Parents
-        </button>
-        <button onclick="location.href='Safe_Home_Housing_Service_Provider_One_Pager.pdf'">
-            <img src="images/service_providers.png" alt="For Service Providers">
-            For Service Providers
-        </button>
-        <button onclick="location.href='available-apartments.html'">
-            <img src="images/apartments.png" alt="View Available Apartments">
-            View Available Apartments
-        </button>
-    </main>
+    <div class="layout">
+        <nav>
+            <button onclick="loadContent('Safe_Home_Housing_Parent.pdf')">
+                <img src="images/parents.png" alt="For Parents">
+                For Parents
+            </button>
+            <button onclick="loadContent('Safe_Home_Housing_Service_Provider.pdf')">
+                <img src="images/service_providers.png" alt="For Service Providers">
+                For Service Providers
+            </button>
+            <button onclick="loadContent('available-apartments.html')">
+                <img src="images/apartments.png" alt="View Available Apartments">
+                View Available Apartments
+            </button>
+        </nav>
+        <main id="content">
+            <p>Welcome to SafeHomeHousing! Select an option to view content.</p>
+        </main>
+    </div>
     <footer>
         <p>&copy; 2025 Safe Home Housing. All rights reserved.</p>
     </footer>
